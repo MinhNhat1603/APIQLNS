@@ -22,8 +22,6 @@ router.get("/", salaryDecController.dowloadContractAddendum);
 
 //Đánh giá kiểm tra tiêu chí tăng lương
 router.put("/check/:id", authController.veryfyAdmin,salaryDecController.checkSalaryDec);
-
 //Giám đốc duyệt
 router.put("/director/:id", authController.veryfyAdmin,salaryDecController.directorCheck);
-
 module.exports =router;

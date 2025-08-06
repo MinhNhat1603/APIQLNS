@@ -54,12 +54,6 @@ const employeesSchema = new mongoose.Schema({
     salary:{    //Lương
         type: Number
     },
-    travelAllowance:{
-        type: Number
-    },
-    eatingAllowance:{
-        type: Number
-    },
     contract:{
         type: String,
         ref: "contracts",

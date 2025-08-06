@@ -1,7 +1,8 @@
-const employee = require("../models/employeesModel");
-const branch = require("../models/branchesModel");
-const department = require("../models/departmentsModel");
+const fs = require('fs');
+const path = require('path');
 
+const employee = require("../models/employeesModel");
+const ExcelJS = require('exceljs');
 const employController = {
     //ADD  employ
     addEmploy: async (req, res) => {
@@ -30,10 +31,9 @@ const employController = {
     },
     //GET ALL employ
     getAllEmploy: async (req, res) => {
-        try {  
-            const employeeIn = await employInRoleAdmin(req.user);
-            return res.status(200).json(employeeIn);
-            
+        try {
+            const employALL = await employee.find();
+            return res.status(200).json(employALL);
         } catch (error) {
             return res.status(500).json(error);
         }
@@ -157,36 +157,4 @@ module.exports = employController;
 
 async function removeVietnameseDiacritics(str) {
     return await str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D');
-}
-
-async function employInRoleAdmin(user) {
-    if( user == "admin"){
-        const employALL = await employee.find()
-        return employALL;
-    }
-    const aBranch = await branch.findOne({ idBranch: user});
-    if (!aBranch) {
-        return "not found";
-    }
-    var employIn =[];
-    for (let i = 0; i < aBranch.departments.length; i++){
-        employs = await employee.find({department : aBranch.departments[i]});
-        employIn = employIn.concat(employs);
-    }
-    return employIn;
-}
-
-async function employInRoleUser(user, position) {
-    var employIn = [];
-    if(position == "Director"){
-        const isHas = await branch.findOne({representative: position})
-        for (let i = 0; i < aBranch.departments.length; i++){
-            employs = await employee.find({department : aBranch.departments[i]});
-            employIn = employIn.concat(employs);
-        }
-    }else if(position == "Manager"){
-        const isHas = await department.findOne({manager: position})
-        employIn =await employee.find({department : isHas.idDepartment});
-    }
-    return employIn;
 }

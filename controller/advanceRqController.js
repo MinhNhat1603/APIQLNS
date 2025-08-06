@@ -1,7 +1,5 @@
+const user = require("../models/usersModel");
 const advanceRq = require("../models/advanceRqModel");
-const branch = require("../models/branchesModel");
-const employee = require("../models/employeesModel");
-
 const advanceRqController = {
     //ADD advanceRq
     addAdvanceRq: async (req, res) => {
@@ -9,34 +7,31 @@ const advanceRqController = {
             req.body.employee = req.user;
             const newAdvanceRq = new advanceRq(req.body);
             const saveAdvanceRq = await newAdvanceRq.save();
-            return res.status(200).json(saveAdvanceRq);
+            res.status(200).json(saveAdvanceRq);
         } catch (error) {
-            return res.status(500).json(error);
+            res.status(500).json(error);
         }
     },
     //GET ALL advanceRq
     getAllAdvanceRq: async (req, res) => {
         try {
             const allAdvanceRq = await advanceRq.find();
-            const employeeIn = await employInRoleAdmin(req.user);
-            const AdvanceRqInRole = await filterRole(allAdvanceRq, employeeIn);
-
-            return res.status(200).json(AdvanceRqInRole);
+            res.status(200).json(allAdvanceRq);
         } catch (error) {
-            return res.status(500).json(error);
+            res.status(500).json(error);
         }
     },
     //GET A advanceRq
     getAdvanceRq: async (req, res) => {
         try {
             const AdvanceRq = await advanceRq.findById(req.params.id);
-            if(req.user == AdvanceRq.employee || req.role =="admin"){
+            if(req.user == AdvanceRq.employee || req.user =="admin"){
                 return res.status(200).json(AdvanceRq);
             }else {
                 return res.status(403).json("You do not have permission");
             }
         } catch (error) {
-            return res.status(500).json(error);
+            res.status(500).json(error);
         }
     },
 
@@ -46,77 +41,43 @@ const advanceRqController = {
             const AdvanceRq = await advanceRq.findById(req.params.id)
             delete req.body.status;
             delete req.body.employee;
-            if(req.user == AdvanceRq.employee || req.role =="admin"){
+            if(req.user == AdvanceRq.employee || req.user =="admin"){
                 await AdvanceRq.updateOne({ $set: req.body });
-                return res.status(200).json("Update successfully!");
+                res.status(200).json("Update successfully!");
             }else {
                 return res.status(403).json("You do not have permission");
             }
         } catch (error) {
-            return res.status(500).json(error);
+            res.status(500).json(error);
         }
     },
 
     approvalAdvanceRq: async (req, res) => {
         try {
-            const employeeIn = await employInRoleAdmin(req.user);
-            const AdvanceRq = await advanceRq.findById(req.params.id);
-            const exists = employeeIn.some(employee => employee.idEmployee === AdvanceRq.employee);
-            if(exists){
-                await AdvanceRq.updateOne({
-                    status: req.body.status,
-                    approvedUser: req.user
-                });
-                return res.status(200).json("Update successfully!");
-            }else{
-                return res.status(403).json("You do not have permission");
-            }
-            
+            const AdvanceRq = await advanceRq.findById(req.params.id)
+            await AdvanceRq.updateOne({
+                status: req.body.status,
+                approvedUser: req.user
+            });
+            res.status(200).json("Update successfully!");
         } catch (error) {
-            return res.status(500).json(error);
+            res.status(500).json(error);
         }
     },
 
     //Cac phiêu ứng tiên của nhân viên
     employHasAdvanceRq: async (req, res) => {
-        try {  
-            if(req.user == req.params.id || req.role =="admin"){
+        try {
+            if(req.user ==req.params.id || req.user =="admin"){
                 const AdvanceRq = await advanceRq.find({ employee: req.params.id })
-                return res.status(200).json(AdvanceRq);
+                res.status(200).json(AdvanceRq);
             }else {
                 return res.status(403).json("You do not have permission");
             }
         } catch (error) {
-            return res.status(500).json(error);
+            res.status(500).json(error);
         }
     },
 };
 
 module.exports = advanceRqController;
-
-async function employInRoleAdmin(user) {
-    if( user == "admin"){
-        const employALL = await employee.find()
-        return employALL;
-    }
-    const aBranch = await branch.findOne({ idBranch: user});
-    if (!aBranch) {
-        return "not found";
-    }
-    var employIn =[];
-    for (let i = 0; i < aBranch.departments.length; i++){
-        employs = await employee.find({department : aBranch.departments[i]});
-        employIn = employIn.concat(employs);
-    }
-    return employIn;
-}
-
-async function filterRole(all, employeeIn) {
-    const IDemployeeIn = employeeIn.map(employee => employee.idEmployee);
-    const afilterRole = all.filter(object=>
-        IDemployeeIn.includes(object.employee)
-    );
-    return afilterRole;
-}
-
-            
