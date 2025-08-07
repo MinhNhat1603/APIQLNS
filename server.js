@@ -6,6 +6,12 @@ const bodyParser = require("body-parser");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+const swaggerOptions = require('./swaggerOptions');
+const specs = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+
 
 const userRoute = require("./routes/userRoute");
 const authRoute = require("./routes/authRoute");

@@ -13,7 +13,7 @@ const authController = {
                 password: req.body.password
             });
             if(!auser){
-                return res.status(404).json("Wrong username or password");
+                return res.status(401).json("Wrong username or password");
             }else{ 
                 const accessToken = jwt.sign({
                     userName: auser.userName
@@ -31,12 +31,12 @@ const authController = {
     },
     logoutUser:async (req, res)=>{
         try {
-            // Lấy token từ tiêu đề và hủy phiên đăng nhập
+            // Lấy token từ header và hủy phiên đăng nhập
             const token = req.headers.token;
             if (!token) {
                 return res.status(400).json("Token not provided");
             }
-            const accessToken = token.split(" ")[1]; // Tách token từ tiêu đề
+            const accessToken = token.split(" ")[1]; // Tách token 
             req.session.destroy(); // Hủy phiên đăng nhập
     
             // Xóa tài liệu từ bộ sưu tập keyToken dựa trên accessToken
