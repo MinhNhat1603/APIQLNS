@@ -54,5 +54,6 @@ app.use("/timeSheet", timeSheetRoute);
 app.use("/paySlip", paySlipRoute);
 
 app. listen(5000,()=>{
-    console.log("Server running.");
+    console.log('Server run in http://localhost:5000');
+    console.log('Swagger docs in http://localhost:5000/api-docs');
 });
