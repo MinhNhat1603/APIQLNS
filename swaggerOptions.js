@@ -9,9 +9,9 @@ module.exports = {
     },
     servers: [
       {
-        url: 'http://localhost:5000', // hoặc URL production nếu cần
+        url: 'http://localhost:5000', 
       },
     ],
   },
-  apis: ['./routes/*.js'], // đường dẫn tới các file định nghĩa Swagger comments
+  apis: ['./routes/*.js'], 
 };
