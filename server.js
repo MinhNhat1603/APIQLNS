@@ -6,6 +6,12 @@ const bodyParser = require("body-parser");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+const swaggerOptions = require('./swaggerOptions');
+const specs = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+
 
 const userRoute = require("./routes/userRoute");
 const authRoute = require("./routes/authRoute");
@@ -54,5 +60,6 @@ app.use("/timeSheet", timeSheetRoute);
 app.use("/paySlip", paySlipRoute);
 
 app. listen(5000,()=>{
-    console.log("Server running.");
+    console.log('Server run in http://localhost:5000');
+    console.log('Swagger docs in http://localhost:5000/api-docs');
 });
